@@ -25,37 +25,26 @@ class MySpider(CrawlSpider):
     name = "propiedadesSpider"
 
     custom_settings = {
-        "USER_AGENT": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5892.0 Safari/537.36",
+        "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         "FEED_EXPORT_FIELDS": ["title", "seller", "property_type", "address", "price", 
                                "bedrooms", "bathrooms", "built_area", "land_area", 
                                "description", "publication_date"]
     }
 
     download_delay = 5
+    allowed_domains = ["casas.mitula.mx"]
 
-    allowed_domains = ["www.nuroa.com.mx"]
-
-    start_urls = ["https://www.nuroa.com.mx/venta-casas/casa-oaxaca",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=2",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=3",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=4",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=5",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=6",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=7",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=8",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=9",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=10",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=11",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=12",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=13",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=14",
-                  "https://www.nuroa.com.mx/venta-casas/casa-oaxaca?page=15"]
+    start_urls = ["https://casas.mitula.mx/casas/casas-oaxaca-juarez",
+                  "https://casas.mitula.mx/casas/casas-oaxaca-juarez/2",
+                  "https://casas.mitula.mx/casas/casas-oaxaca-juarez/3",
+                  "https://casas.mitula.mx/casas/casas-oaxaca-juarez/4",
+                  "https://casas.mitula.mx/casas/casas-oaxaca-juarez/5"]
 
 
     rules = (
         Rule(
             LinkExtractor(
-                allow=r"/adform/"
+                allow=r"/adform/.*"
             ), follow=True, callback="parse"
         ),
     )
@@ -81,7 +70,7 @@ class MySpider(CrawlSpider):
 
     def area_fix(self, text):
         new_text = text.replace("\n", "").replace("\t", "").replace("\r", "")\
-            .replace("m²", "").strip()
+            .replace("m²", "").replace(",", "").strip()
         new_text = int(new_text)
         return new_text
 
@@ -96,10 +85,11 @@ class MySpider(CrawlSpider):
         sel = Selector(response)
 
         item = ItemLoader(Propiedad(), sel) 
-        item.add_xpath("title", "//div[@class='main-title']/text()")
-        item.add_value("seller", "Nuroa")
+        item.add_xpath("title", 
+                       "//div[@class='main-title']/text()")
+        item.add_value("seller", "Mitula")
         item.add_xpath("address", 
-                       "//div[@class='location']/text()")
+                       "//div[@class='location-map__location-address-map']/text()")
         item.add_xpath("price", 
                        "//div[@class='prices-and-fees__price']/text()",
                        MapCompose(self.price_fix))
@@ -130,10 +120,10 @@ class MySpider(CrawlSpider):
         yield item.load_item()
         
 
-# Fecha de extracción 27/08/2023
+
 process = CrawlerProcess({
 "FEED_FORMAT": "csv",
-"FEED_URI": "casas_nuroa_2.csv"
+"FEED_URI": "casas_mitula.csv"
 })
 
 process.crawl(MySpider)
