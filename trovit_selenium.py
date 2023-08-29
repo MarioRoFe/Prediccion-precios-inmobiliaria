@@ -19,7 +19,7 @@ options.add_argument(
 # options.add_argument("--headless")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://inmuebles.nocnok.com/propiedades?stateId=20&countyIds=1065&operation=sale&categories=Habitational&types=House&pageNumber=1&pageSize=21")
+driver.get("https://casas.trovit.com.mx/casa-oaxaca-juarez")
 driver.maximize_window()
 
 # Espero unos segundos después de que cargue la página
@@ -33,11 +33,11 @@ sleep(random.uniform(5.0, 6.0))
 #  Acá me muevo a las pestañas donde están mis datos y los extraigo
 # --------------------------------------------------------------------
 
-reviews = driver.find_elements(By.XPATH, "//div[@class='col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6']")
+reviews = driver.find_elements(By.XPATH, "//ul[@id='wrapper_listing']//li")
 
 for review in reviews:
     # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
-    userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
+    userLink = review.find_element(By.XPATH, ".//div[@class='snippet-content']")
     sleep(random.uniform(5.0, 8.0))
     try:
         # Le doy click para abrir la pestaña
@@ -59,8 +59,8 @@ for review in reviews:
         driver.switch_to.window(driver.window_handles[1])
 
         # Extraigo los datos
-        precio = driver.find_element(By.XPATH, "//h2[@class='price-area-price']").text
-        descripcion = driver.find_element(By.XPATH, "//p[@class='description']").text
+        precio = driver.find_element(By.XPATH, "//div[@class='amount']/span").text
+        descripcion = driver.find_element(By.XPATH, "//div[@id='description']/p").text
         print(precio)
         print(descripcion, end="\n\n")
 
