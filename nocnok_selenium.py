@@ -33,44 +33,71 @@ sleep(random.uniform(5.0, 6.0))
 #  Acá me muevo a las pestañas donde están mis datos y los extraigo
 # --------------------------------------------------------------------
 
-reviews = driver.find_elements(By.XPATH, "//div[@class='col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6']")
+# Obtengo los botones para pasar entre páginas y los recorro con un for
+sleep(random.uniform(2.0, 4.0))
+botones_de_paginacion = driver.find_elements(By.XPATH, "//div[@class='col-xl-12 col-lg-12 col-md-12 col-sm-12']//ul//li[position() >= 2 and position() < last()]")
+for conteo, boton_de_paginacion in enumerate(botones_de_paginacion):
+    if conteo > 1:
+        boton_de_paginacion.click()
 
-for review in reviews:
-    # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
-    userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
-    sleep(random.uniform(5.0, 8.0))
-    try:
-        # Le doy click para abrir la pestaña
-        userLink.click()
-        # Me muevo a la pestaña recién abierta
-        # driver.window_handles contiene una lista con las ventanas 
-        # que están abiertas mediante el driver de selenium. 
-        # Con el índice le indico a cuál moverse
+    # Obtengo la ubicación de cada enlace para entrar al detalle de cada casa
+    reviews = driver.find_elements(By.XPATH, "//div[@class='col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6']")
+    for review in reviews:
+        # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
+        # userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
+        
+        try:
+            # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
+            sleep(random.uniform(5.0, 6.0))
+            userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
+            
+            # # Esperar a que el enlace sea clickeable antes de hacer clic
+            # wait = WebDriverWait(driver, 10)
+            # userLink = wait.until(EC.element_to_be_clickable((By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")))
 
-        # Me aseguro de estar en la sección de opiniones y no en la de fotos
-        # Para esto hago click en opiniones
-        # boton_opiniones = WebDriverWait(driver=driver, timeout=10).until(
-        #     EC.presence_of_element_located((By.XPATH, "//button[@class='link read_more show']"))
-        # )
-        # boton_opiniones.click()
+            # Le doy click para abrir la pestaña
+            sleep(random.uniform(5.0, 6.0))
+            userLink.click()
+
+            # # Esperar a que se abra la nueva pestaña
+            # wait.until(EC.number_of_windows_to_be(2))
+
+            sleep(random.uniform(2.0, 4.0))
+
+            # Me muevo a la nueva pestaña
+            driver.switch_to.window(driver.window_handles[1])
+            
+
+            # Extraigo los datos
+            title = driver.find_element(By.XPATH, "//div[@class='col-xxl-8']/h1").text
+            seller = "Nocnok"
+            property_type = driver.find_element(By.XPATH, "//div[@id='type']//div[@class='col text-end']").text
+            address = driver.find_element(By.XPATH, "//h3[@class='location-area-location']").text
+            price = driver.find_element(By.XPATH, "//h2[@class='price-area-price']").text
+            bedrooms = driver.find_element(By.XPATH, "//div[@id='bedrooms']//div[@class='col text-end']").text
+            bathrooms = driver.find_element(By.XPATH, "//div[@id='fullBathrooms']//div[@class='col text-end']").text
+            built_area = driver.find_element(By.XPATH, "//div[@id='constructionSize']//div[@class='col text-end']").text
+            land_area = driver.find_element(By.XPATH, "//div[@id='lotSize'][1]//div[@class='col text-end']").text
+            description = driver.find_element(By.XPATH, "//p[@class='description']").text
+
+            print("title", title)
+            print("seller", seller)
+            print("property_type", property_type)
+            print("address", address)
+            print("price", price)
+            print("bedrooms", bedrooms)
+            print("bathrooms", bathrooms)
+            print("built_area", built_area)
+            print("land_area", land_area)
+            print("description", description)
 
 
-        # Me muevo a la nueva pestaña
-        driver.switch_to.window(driver.window_handles[1])
+            # Ya que extraje todos los reviews del usuario, cierro la pestaña
+            driver.close()
+            sleep(random.uniform(3.0, 4.0))
+            driver.switch_to.window(driver.window_handles[0])
 
-        # Extraigo los datos
-        precio = driver.find_element(By.XPATH, "//h2[@class='price-area-price']").text
-        descripcion = driver.find_element(By.XPATH, "//p[@class='description']").text
-        print(precio)
-        print(descripcion, end="\n\n")
+        except Exception as e:
+            print(e)
+            driver.switch_to.window(driver.window_handles[0])
 
-        # Ya que extraje todos los reviews del usuario, cierro la pestaña
-        driver.close()
-        sleep(random.uniform(3.0, 4.0))
-        driver.switch_to.window(driver.window_handles[0])
-
-    except Exception as e:
-        print(e)
-        driver.switch_to.window(driver.window_handles[0])
-
-driver.close()
