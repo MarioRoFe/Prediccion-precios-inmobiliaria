@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import csv
 
 
 
@@ -23,81 +24,157 @@ driver.get("https://inmuebles.nocnok.com/propiedades?stateId=20&countyIds=1065&o
 driver.maximize_window()
 
 # Espero unos segundos después de que cargue la página
-# Esto debido a que esta página tiene un comportamiento 
-# un poco raro cuando carga. De esta manera me aseguro
-# de que todo está listo para realizar mis acciones
 sleep(random.uniform(5.0, 6.0))
 
+# Abro un archivo CSV para escritura
+with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
+    # Crea un objeto csv.writer
+    writer = csv.writer(file)
+    
+    # Escribo la primera fila con los nombres de las columnas
+    writer.writerow(['title', 'seller', 'property_type', 'address', 'price', 'bedrooms', 'bathrooms', 'built_Area', 'land_Area', 'parking', 'description'])
 
-
-#  Acá me muevo a las pestañas donde están mis datos y los extraigo
-# --------------------------------------------------------------------
-
-# Obtengo los botones para pasar entre páginas y los recorro con un for
-sleep(random.uniform(2.0, 4.0))
-botones_de_paginacion = driver.find_elements(By.XPATH, "//div[@class='col-xl-12 col-lg-12 col-md-12 col-sm-12']//ul//li[position() >= 2 and position() < last()]")
-for conteo, boton_de_paginacion in enumerate(botones_de_paginacion):
-    if conteo > 1:
-        boton_de_paginacion.click()
-
-    # Obtengo la ubicación de cada enlace para entrar al detalle de cada casa
-    reviews = driver.find_elements(By.XPATH, "//div[@class='col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6']")
-    for review in reviews:
-        # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
-        # userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
-        
+    #  Acá me muevo a las pestañas donde están mis datos y los extraigo
+    # --------------------------------------------------------------------
+    # Obtengo los botones para pasar entre páginas y los recorro con un for
+    botones_de_paginacion = driver.find_elements(By.XPATH, "//div[@class='col-xl-12 col-lg-12 col-md-12 col-sm-12']//ul//li[position() >= 2 and position() < last()]")
+    for boton_de_paginacion in botones_de_paginacion:
         try:
-            # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
-            sleep(random.uniform(5.0, 6.0))
-            userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
-            
-            # # Esperar a que el enlace sea clickeable antes de hacer clic
-            # wait = WebDriverWait(driver, 10)
-            # userLink = wait.until(EC.element_to_be_clickable((By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")))
+            driver.execute_script("arguments[0].scrollIntoView();", boton_de_paginacion)
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable(boton_de_paginacion))
+            sleep(random.uniform(3.0, 6.0))
+            boton_de_paginacion.click()
+            sleep(random.uniform(3.0, 6.0))
 
-            # Le doy click para abrir la pestaña
-            sleep(random.uniform(5.0, 6.0))
-            userLink.click()
+            # Obtengo todos los anuncios de casas y los agrego en una lista para
+            # extraer los datos uno a uno
+            reviews = driver.find_elements(By.XPATH, "//div[@class='col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6']")
+            for review in reviews:
+                try:
+                    # Me ubico en la parte en donde está el link para abrir la pesataña del usuario
+                    userLink = review.find_element(By.XPATH, ".//div[@class='property-card-grid-wrap-details']/span/a")
+                    
+                    # Le doy click para abrir la pestaña
+                    sleep(random.uniform(4.0, 6.0))
+                    userLink.click()
 
-            # # Esperar a que se abra la nueva pestaña
-            # wait.until(EC.number_of_windows_to_be(2))
+                    # Me muevo a la nueva pestaña
+                    sleep(random.uniform(2.0, 4.0))
+                    driver.switch_to.window(driver.window_handles[1])
+                    
 
-            sleep(random.uniform(2.0, 4.0))
+                    # Extraigo los datos
+                    try:
+                        title = driver.find_element(By.XPATH, "//div[@class='col-xxl-8']/h1").text
+                        title = title.replace("\n", "").replace("\t", "").replace("\r", "").strip()
+                    except:
+                        title = None
 
-            # Me muevo a la nueva pestaña
-            driver.switch_to.window(driver.window_handles[1])
-            
+                    seller = "Nocnok"
+                    seller.strip()
 
-            # Extraigo los datos
-            title = driver.find_element(By.XPATH, "//div[@class='col-xxl-8']/h1").text
-            seller = "Nocnok"
-            property_type = driver.find_element(By.XPATH, "//div[@id='type']//div[@class='col text-end']").text
-            address = driver.find_element(By.XPATH, "//h3[@class='location-area-location']").text
-            price = driver.find_element(By.XPATH, "//h2[@class='price-area-price']").text
-            bedrooms = driver.find_element(By.XPATH, "//div[@id='bedrooms']//div[@class='col text-end']").text
-            bathrooms = driver.find_element(By.XPATH, "//div[@id='fullBathrooms']//div[@class='col text-end']").text
-            built_area = driver.find_element(By.XPATH, "//div[@id='constructionSize']//div[@class='col text-end']").text
-            land_area = driver.find_element(By.XPATH, "//div[@id='lotSize'][1]//div[@class='col text-end']").text
-            description = driver.find_element(By.XPATH, "//p[@class='description']").text
+                    try:
+                        property_type = driver.find_element(By.XPATH, "//div[@id='type']//div[@class='col text-end']").text
+                        property_type = property_type.strip() 
+                    except:
+                        property_type = None
 
-            print("title", title)
-            print("seller", seller)
-            print("property_type", property_type)
-            print("address", address)
-            print("price", price)
-            print("bedrooms", bedrooms)
-            print("bathrooms", bathrooms)
-            print("built_area", built_area)
-            print("land_area", land_area)
-            print("description", description)
+                    try:
+                        address = driver.find_element(By.XPATH, "//h3[@class='location-area-location']").text
+                        address = address.strip()
+                    except:
+                        address = None
+
+                    try:
+                        price = driver.find_element(By.XPATH, "//h2[@class='price-area-price']").text
+                        price = price.replace("$", "").replace(",", "").replace("MXN", "").strip()
+                    except:
+                        price = None
+
+                    try:
+                        bedrooms = driver.find_element(By.XPATH, "//div[@id='bedrooms']//div[@class='col text-end']").text
+                        bedrooms = bedrooms.strip()
+                    except:
+                        bedrooms = None
+
+                    try:
+                        bathrooms = driver.find_element(By.XPATH, "//div[@id='fullBathrooms']//div[@class='col text-end']").text
+                        bathrooms = bathrooms.strip()
+                    except:
+                        bathrooms = None
+
+                    try:
+                        built_area = driver.find_element(By.XPATH, "//div[@id='constructionSize']//div[@class='col text-end']").text
+                        built_area = built_area.replace("m²", "").strip()
+                    except:
+                        built_area = None
+
+                    try:
+                        land_area = driver.find_element(By.XPATH, "//div[@id='lotSize'][1]//div[@class='col text-end']").text
+                        land_area = land_area.replace("m²", "").strip()
+                    except:
+                        land_area = None
+
+                    try:
+                        parking = driver.find_element(By.XPATH, "//div[@class='icon-box']/span/i[@class='fa fa-car']/following-sibling::text()[1]").text
+                        parking = parking.strip()
+                    except:
+                        parking = None
+
+                    try:
+                        description = driver.find_element(By.XPATH, "//p[@class='description']").text
+                        description = description.replace("\n", "").replace("\t", "").replace("\r", "").strip()
+                    except:
+                        description = None
 
 
-            # Ya que extraje todos los reviews del usuario, cierro la pestaña
-            driver.close()
-            sleep(random.uniform(3.0, 4.0))
-            driver.switch_to.window(driver.window_handles[0])
+
+                    # title.replace("\n", "").replace("\t", "").replace("\r", "").strip()
+                    # seller.strip()
+                    # property_type.strip() 
+                    # address.strip()
+                    # price.replace("$", "").replace(",", "").replace("MXN", "").strip()
+                    # bedrooms.strip()
+                    # bathrooms.strip()
+                    # built_area.replace("m²", "").strip()
+                    # land_area.strip("m²", "").strip()
+                    # description.replace("\n", "").replace("\t", "").replace("\r", "").strip()
+                    
+                    
+                    print("title", title)
+                    print("seller", seller)
+                    print("property_type", property_type)
+                    print("address", address)
+                    print("price", price)
+                    print("bedrooms", bedrooms)
+                    print("bathrooms", bathrooms)
+                    print("built_area", built_area)
+                    print("land_area", land_area)
+                    print("parking", parking)
+                    print("description", description)
+
+                    # Escribe una fila en el archivo CSV
+                    writer.writerow([title, seller, property_type, address, price, bedrooms, bathrooms, built_area, land_area, parking, description])
+
+
+                    # Ya que extraje todos los reviews del usuario, cierro la pestaña
+                    sleep(random.uniform(1.0, 3.0))
+                    driver.close()
+                    driver.switch_to.window(driver.window_handles[0])
+
+                except Exception as e:
+                    print(e)
+                    driver.switch_to.window(driver.window_handles[0])
 
         except Exception as e:
-            print(e)
-            driver.switch_to.window(driver.window_handles[0])
+            print(f"Falló la paginación")
+            print(f"error{e}")
+
+
+# Cerrar el navegador
+driver.quit()
+
+
+
+
 
