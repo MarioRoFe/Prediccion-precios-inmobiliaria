@@ -17,14 +17,14 @@ options.add_argument(
     "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
 )
 
-# options.add_argument("--headless")
+options.add_argument("--headless")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://inmuebles.nocnok.com/propiedades?stateId=20&countyIds=1065&operation=sale&categories=Habitational&types=House&pageNumber=1&pageSize=21")
-driver.maximize_window()
+driver.get("https://inmuebles.nocnok.com/propiedad/casa-en-venta/oaxaca/oaxaca-de-juarez/del-maestro-id-mx20-ie7138")
+# driver.maximize_window()
 
 # Espero unos segundos después de que cargue la página
-sleep(random.uniform(5.0, 6.0))
+sleep(random.uniform(2.0, 4.0))
 
 # Abro un archivo CSV para escritura
 with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
@@ -32,7 +32,7 @@ with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     
     # Escribo la primera fila con los nombres de las columnas
-    writer.writerow(['title', 'seller', 'property_type', 'address', 'price', 'bedrooms', 'bathrooms', 'built_Area', 'land_Area', 'parking', 'description'])
+    # writer.writerow(['title', 'seller', 'property_type', 'address', 'price', 'bedrooms', 'bathrooms', 'built_Area', 'land_Area', 'parking', 'description'])
 
     #  Acá me muevo a las pestañas donde están mis datos y los extraigo
     # --------------------------------------------------------------------
@@ -160,8 +160,3 @@ with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
 
 # Cerrar el navegador
 driver.quit()
-
-
-
-
-
