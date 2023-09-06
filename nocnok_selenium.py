@@ -126,19 +126,6 @@ with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
                         description = description.replace("\n", "").replace("\t", "").replace("\r", "").strip()
                     except:
                         description = None
-
-
-
-                    # title.replace("\n", "").replace("\t", "").replace("\r", "").strip()
-                    # seller.strip()
-                    # property_type.strip() 
-                    # address.strip()
-                    # price.replace("$", "").replace(",", "").replace("MXN", "").strip()
-                    # bedrooms.strip()
-                    # bathrooms.strip()
-                    # built_area.replace("m²", "").strip()
-                    # land_area.strip("m²", "").strip()
-                    # description.replace("\n", "").replace("\t", "").replace("\r", "").strip()
                     
                     
                     print("title", title)
