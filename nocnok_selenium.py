@@ -32,7 +32,7 @@ with open('casas_nocnok.csv', mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     
     # Escribo la primera fila con los nombres de las columnas
-    # writer.writerow(['title', 'seller', 'property_type', 'address', 'price', 'bedrooms', 'bathrooms', 'built_Area', 'land_Area', 'parking', 'description'])
+    writer.writerow(['title', 'seller', 'property_type', 'address', 'price', 'bedrooms', 'bathrooms', 'built_Area', 'land_Area', 'parking', 'description'])
 
     #  Acá me muevo a las pestañas donde están mis datos y los extraigo
     # --------------------------------------------------------------------
