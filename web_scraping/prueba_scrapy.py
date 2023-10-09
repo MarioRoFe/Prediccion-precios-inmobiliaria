@@ -11,7 +11,7 @@ class Propiedad(Item):
     # vendedor = Field()
     # tipo_propiedad = Field()
     # direccion = Field()
-    precio  = Field()
+    precio = Field()
     # recamaras = Field()
     # banios = Field()
     # construccion_m2 = Field()
@@ -25,25 +25,23 @@ class MySpider(CrawlSpider):
     custom_settings = {
         "USER_AGENT": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5892.0 Safari/537.36",
         # "FEED_EXPORT_FIELDS": ["vendedor", "tipo_propiedad", "direccion", "precio" ,"recamaras","banios","construccion_m2", "terreno_m2", "descripcion"]
-        "FEED_EXPORT_FIELDS": ["precio"]
+        "FEED_EXPORT_FIELDS": ["precio"],
     }
 
     download_delay = 5
     allowed_domains = ["inmuebles.nocnok.com"]
 
-    start_urls = ["https://inmuebles.nocnok.com/propiedades?stateId=20&countyIds=1065&operation=sale&categories=Habitational&types=House&pageNumber=1&pageSize=21"]
-
-
+    start_urls = [
+        "https://inmuebles.nocnok.com/propiedades?stateId=20&countyIds=1065&operation=sale&categories=Habitational&types=House&pageNumber=1&pageSize=21"
+    ]
 
     rules = (
         # entrar y extraer
         Rule(
-            LinkExtractor(
-                allow=r"propiedad/casa-en-venta/oaxaca"
-            ), follow=True, callback="parse"
+            LinkExtractor(allow=r"propiedad/casa-en-venta/oaxaca"),
+            follow=True,
+            callback="parse",
         ),
-    
-
         # # Paginacion
         # Rule(
         #     LinkExtractor(
@@ -51,8 +49,6 @@ class MySpider(CrawlSpider):
         #     ), follow=True
         # ),
     )
-
-
 
     def parse(self, response):
         sel = Selector(response)
@@ -76,16 +72,11 @@ class MySpider(CrawlSpider):
         #         item.add_value("construccion_m2", amenitie_value)
         #     elif amenitie_name.strip() == "Superficie del terreno":
         #         item.add_value("terreno_m2", amenitie_value)
-        
 
         yield item.load_item()
-        
 
 
-process = CrawlerProcess({
-"FEED_FORMAT": "csv",
-"FEED_URI": "prueba.csv"
-})
+process = CrawlerProcess({"FEED_FORMAT": "csv", "FEED_URI": "prueba.csv"})
 
 process.crawl(MySpider)
 process.start()

@@ -2,10 +2,9 @@ import random
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-
 
 
 # Acá entro a la página semilla
@@ -19,15 +18,16 @@ options.add_argument(
 # options.add_argument("--headless")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://www.icasas.mx/venta/habitacionales-casas-oaxaca-oaxaca-juarez-2_5_20_0_1066_0")
+driver.get(
+    "https://www.icasas.mx/venta/habitacionales-casas-oaxaca-oaxaca-juarez-2_5_20_0_1066_0"
+)
 driver.maximize_window()
 
 # Espero unos segundos después de que cargue la página
-# Esto debido a que esta página tiene un comportamiento 
+# Esto debido a que esta página tiene un comportamiento
 # un poco raro cuando carga. De esta manera me aseguro
 # de que todo está listo para realizar mis acciones
 sleep(random.uniform(5.0, 6.0))
-
 
 
 #  Acá me muevo a las pestañas donde están mis datos y los extraigo
@@ -43,21 +43,24 @@ for review in reviews:
         # Le doy click para abrir la pestaña
         userLink.click()
         # Me muevo a la pestaña recién abierta
-        # driver.window_handles contiene una lista con las ventanas 
-        # que están abiertas mediante el driver de selenium. 
+        # driver.window_handles contiene una lista con las ventanas
+        # que están abiertas mediante el driver de selenium.
         # Con el índice le indico a cuál moverse
 
         # Me aseguro de estar en la sección de opiniones y no en la de fotos
         # Para esto hago click en opiniones
         boton_opiniones = WebDriverWait(driver=driver, timeout=10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@class='link read_more show']"))
+            EC.presence_of_element_located(
+                (By.XPATH, "//button[@class='link read_more show']")
+            )
         )
         boton_opiniones.click()
 
-
         # Extraigo los datos
         precio = driver.find_element(By.XPATH, "//div[@class='price']/h2").text
-        descripcion = driver.find_element(By.XPATH, "//div[@class='info']/p[@class='description long_text']").text
+        descripcion = driver.find_element(
+            By.XPATH, "//div[@class='info']/p[@class='description long_text']"
+        ).text
         print(precio)
         print(descripcion, end="\n\n")
 
