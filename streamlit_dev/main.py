@@ -7,10 +7,7 @@ import joblib
 import time
 
 # ----------------------------- CONFIGURACIÓN INICIAL -----------------------------
-st.set_page_config(
-    page_title="Predicción de precios",
-    page_icon="🏡"
-)
+st.set_page_config(page_title="Predicción de precios", page_icon="🏡")
 
 # Elementos que se usarán en la sección main
 main_text = """
@@ -44,7 +41,7 @@ with open("./streamlit_dev/visuales/main_animation.json") as source_main_animati
 
 # Titulo de la página
 st.markdown(
-        """
+    """
     <style>
     .centered-text {
         text-align: center;
@@ -54,7 +51,7 @@ st.markdown(
     </style>
     <div class="centered-text">ESTIMACIÓN DE PRECIOS DE VIVIENDAS EN OAXACA DE JUAREZ</div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 st.markdown("---")
@@ -75,22 +72,20 @@ selected = option_menu(
             "font-size": "25px",
             "text-aling": "left",
             "margin": "0px",
-            "--hover-color": "#053C5E"
+            "--hover-color": "#053C5E",
         },
-        "nav-link-selected": {"background-color": "#b21e35"}
+        "nav-link-selected": {"background-color": "#b21e35"},
     },
 )
 
 
 # ----------------------------- SECCIÓN HOME -----------------------------
 if selected == "Home":
-
-# ----- Side bar -----
+    # ----- Side bar -----
     with st.sidebar:
         st.header("Bienvenido!!!")
-        st.markdown(main_text,
-            unsafe_allow_html=True)
-   
+        st.markdown(main_text, unsafe_allow_html=True)
+
         col_bar1, col_bar2, col_bar3 = st.columns([0.10, 0.10, 0.70])
         with col_bar1:
             st.markdown(
@@ -101,7 +96,7 @@ if selected == "Home":
                     </svg>
                 </a>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
         with col_bar2:
             st.markdown(
@@ -112,7 +107,7 @@ if selected == "Home":
                 </svg>
                 </a>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
         with col_bar3:
             st.markdown(
@@ -124,10 +119,8 @@ if selected == "Home":
                     <p style="margin-left: 10px;">mario.r.felix19@gmail.com</p>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
-
-
 
     left_col_home, center_col_home, right_col_home = st.columns([0.20, 0.60, 0.20])
     with center_col_home:
@@ -137,21 +130,18 @@ if selected == "Home":
             height=400,
             loop=True,
             speed=1,
-                  )
-
-
-
+        )
 
 
 # ----------------------------- SECCIÓN PREDICCIÓN -----------------------------
 if selected == "Predecir":
     left_col_predecir, right_col_predecir = st.columns((2, 1))
 
-#                        ----- Formularios -----
+    #                        ----- Formularios -----
     with left_col_predecir:
         # Subtítulo del formulario
         st.markdown(
-                """
+            """
             <style>
             .centered-text-subtitle {
                 text-align: center;
@@ -161,33 +151,24 @@ if selected == "Predecir":
             </style>
             <div class="centered-text-subtitle">Ingresa los datos de la propiedad</div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-        # Se crea un campo formulario que contendrá los campos para 
+        # Se crea un campo formulario que contendrá los campos para
         # recibir los inputs del ususario
         with st.form(key="Form1", clear_on_submit=True):
-            bedrooms = st.number_input("Número de Recámaras", 
-                                       value=1)
-            bathrooms = st.number_input("Número de Baños", 
-                                        value=1.0)
-            built_area = st.number_input("Tamaño de Construcción (M2)", 
-                                    value=1.0)
-            land_area = st.number_input("Tamaño de Terreno (M2)", 
-                                    value=1.0)
-            location = st.selectbox(label="""Selecciona la ubicación""",
-                                    help="Tomando como referencia al zócalo de la ciudad", 
-                                    options=(
-                                        "Nor-Oeste",
-                                        "Nor-Este",
-                                        "Sur-Oeste",
-                                        "Sur-Este"
-                                    ))
+            bedrooms = st.number_input("Número de Recámaras", value=1)
+            bathrooms = st.number_input("Número de Baños", value=1.0)
+            built_area = st.number_input("Tamaño de Construcción (M2)", value=1.0)
+            land_area = st.number_input("Tamaño de Terreno (M2)", value=1.0)
+            location = st.selectbox(
+                label="""Selecciona la ubicación""",
+                help="Tomando como referencia al zócalo de la ciudad",
+                options=("Nor-Oeste", "Nor-Este", "Sur-Oeste", "Sur-Este"),
+            )
             enter = st.form_submit_button("Enter")
-                        
 
-
-#                        ----- Resultado -----
+    #                        ----- Resultado -----
     with right_col_predecir:
         # Cargando el modelo entrenado previamente
         model_loaded = joblib.load("./notebooks/best_model.pkl")
@@ -201,17 +182,17 @@ if selected == "Predecir":
         elif location == "Sur-Oeste":
             location = "sw"
         else:
-            location = "se"         
+            location = "se"
 
         data = pd.DataFrame(
             data={
-            "bedrooms": bedrooms,
-            "bathrooms": bathrooms,
-            "built_area": built_area,
-            "land_area": land_area,
-            "location": location
+                "bedrooms": bedrooms,
+                "bathrooms": bathrooms,
+                "built_area": built_area,
+                "land_area": land_area,
+                "location": location,
             },
-            index=[0]
+            index=[0],
         )
 
         # En esta sección se muestra la estimació del modelo
@@ -226,11 +207,11 @@ if selected == "Predecir":
             </style>
             <div class="centered-text_final">Resultado</div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-#                        ----- Resultado -----
-        with st.form("Form2", clear_on_submit=True):    
+        #                        ----- Resultado -----
+        with st.form("Form2", clear_on_submit=True):
             if enter:
                 try:
                     st.markdown(
@@ -244,28 +225,26 @@ if selected == "Predecir":
                         </style>
                         <div class="centered-text_predict">Precio Estimado</div>
                         """,
-                        unsafe_allow_html=True
-                    )    
+                        unsafe_allow_html=True,
+                    )
                     with st.spinner("Calculando..."):
                         time.sleep(1)
                     prediction = model_loaded.predict(data)[0]
                     prediction_format = "${:,.0f}".format(prediction)
                     st.markdown(
-                    f'<div style="font-size: 34px; margin-top: 20px; text-align: center;">{prediction_format}</div>',
-                    unsafe_allow_html=True
+                        f'<div style="font-size: 34px; margin-top: 20px; text-align: center;">{prediction_format}</div>',
+                        unsafe_allow_html=True,
                     )
                     st.markdown("---")
 
-                    with open("./streamlit_dev/visuales/animation_house.json") as source_house:
+                    with open(
+                        "./streamlit_dev/visuales/animation_house.json"
+                    ) as source_house:
                         animation_house = json.load(source_house)
                     # se ejecuta la animación
                     st_lottie(
-                        animation_house, 
-                        width=200, 
-                        height=232, 
-                        loop=False,
-                        speed=3
-                        )
+                        animation_house, width=200, height=232, loop=False, speed=3
+                    )
                 except:
                     st.error("Ups, un error ha ocurrido, intenta de nuevo")
 
@@ -274,16 +253,15 @@ if selected == "Predecir":
     st.markdown("---")
 
 
-
 # ----------------------------- SECCIÓN COMPARACIÓN -----------------------------
 if selected == "Comparar":
     left_col_comparar, right_col_comparar = st.columns((2, 1))
 
-#                        ----- Formularios -----
+    #                        ----- Formularios -----
     with left_col_comparar:
         # Subtítulo del formulario
         st.markdown(
-                """
+            """
             <style>
             .centered-text-subtitle {
                 text-align: center;
@@ -293,34 +271,25 @@ if selected == "Comparar":
             </style>
             <div class="centered-text-subtitle">Ingresa los datos de la propiedad</div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-        # Se crea un campo formulario que contendrá los campos para 
+        # Se crea un campo formulario que contendrá los campos para
         # recibir los inputs del ususario
         with st.form(key="Form3", clear_on_submit=True):
-            price = st.number_input("Precio de la casa", 
-                                    value=1.0)
-            bedrooms = st.number_input("Número de Recámaras", 
-                                       value=1)
-            bathrooms = st.number_input("Número de Baños", 
-                                        value=1.0)
-            built_area = st.number_input("Tamaño de Construcción (M2)", 
-                                    value=1.0)
-            land_area = st.number_input("Tamaño de Terreno (M2)", 
-                                    value=1.0)
-            location = st.selectbox(label="""Selecciona la ubicación""",
-                                    help="Tomando como referencia al zócalo de la ciudad", 
-                                    options=(
-                                        "Nor-Oeste",
-                                        "Nor-Este",
-                                        "Sur-Oeste",
-                                        "Sur-Este"
-                                    ))
+            price = st.number_input("Precio de la casa", value=1.0)
+            bedrooms = st.number_input("Número de Recámaras", value=1)
+            bathrooms = st.number_input("Número de Baños", value=1.0)
+            built_area = st.number_input("Tamaño de Construcción (M2)", value=1.0)
+            land_area = st.number_input("Tamaño de Terreno (M2)", value=1.0)
+            location = st.selectbox(
+                label="""Selecciona la ubicación""",
+                help="Tomando como referencia al zócalo de la ciudad",
+                options=("Nor-Oeste", "Nor-Este", "Sur-Oeste", "Sur-Este"),
+            )
             enter = st.form_submit_button("Enter")
 
-
-#                        ----- Resultado -----
+    #                        ----- Resultado -----
     with right_col_comparar:
         # Cargando el modelo entrenado previamente
         model_loaded = joblib.load("./notebooks/best_model.pkl")
@@ -334,18 +303,17 @@ if selected == "Comparar":
         elif location == "Sur-Oeste":
             location = "sw"
         else:
-            location = "se"         
-                    
+            location = "se"
 
         data = pd.DataFrame(
             data={
-            "bedrooms": bedrooms,
-            "bathrooms": bathrooms,
-            "built_area": built_area,
-            "land_area": land_area,
-            "location": location
+                "bedrooms": bedrooms,
+                "bathrooms": bathrooms,
+                "built_area": built_area,
+                "land_area": land_area,
+                "location": location,
             },
-            index=[0]
+            index=[0],
         )
 
         # En esta sección se muestra la estimación del modelo
@@ -360,11 +328,11 @@ if selected == "Comparar":
             </style>
             <div class="centered-text_final">Resultado</div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-#                        ----- Animación Resultado -----
-        with st.form("Form4", clear_on_submit=True):    
+        #                        ----- Animación Resultado -----
+        with st.form("Form4", clear_on_submit=True):
             if enter:
                 try:
                     with st.spinner("Calculando..."):
@@ -383,21 +351,20 @@ if selected == "Comparar":
                         </style>
                         <div class="centered-text_p_real">Precio Actual</div>
                         """,
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
                     if prediction > price:
                         st.markdown(
-                        f'<div style="font-size: 34px; margin-top: 0px; text-align: center; color: #38b000;">{price_format}</div>',
-                        unsafe_allow_html=True
+                            f'<div style="font-size: 34px; margin-top: 0px; text-align: center; color: #38b000;">{price_format}</div>',
+                            unsafe_allow_html=True,
                         )
                         st.write("---")
                     else:
                         st.markdown(
-                        f'<div style="font-size: 34px; margin-top: 0px; text-align: center; color: #b21e35;">{price_format}</div>',
-                        unsafe_allow_html=True
+                            f'<div style="font-size: 34px; margin-top: 0px; text-align: center; color: #b21e35;">{price_format}</div>',
+                            unsafe_allow_html=True,
                         )
                         st.write("---")
-
 
                     st.markdown(
                         """
@@ -411,14 +378,12 @@ if selected == "Comparar":
                         </style>
                         <div class="centered-text_p_estimado">Precio Estimado</div>
                         """,
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
 
-                    
-
                     st.markdown(
-                    f'<div style="font-size: 34px; margin-top: 0px; text-align: center;">{prediction_format}</div>',
-                    unsafe_allow_html=True
+                        f'<div style="font-size: 34px; margin-top: 0px; text-align: center;">{prediction_format}</div>',
+                        unsafe_allow_html=True,
                     )
                     st.write("---")
 
@@ -426,34 +391,30 @@ if selected == "Comparar":
                         sub_precio = "Se encuentra por debajo del precio de mercado"
                         st.write(
                             f'<div style="font-size: 18px; margin-top: -10px; text-align: center;">{sub_precio}</div>',
-                            unsafe_allow_html=True
+                            unsafe_allow_html=True,
                         )
-                        with open("./streamlit_dev/visuales/green_animation.json") as source_house:
+                        with open(
+                            "./streamlit_dev/visuales/green_animation.json"
+                        ) as source_house:
                             animation_house = json.load(source_house)
                         # se ejecuta la animación
                         st_lottie(
-                            animation_house, 
-                            width=200, 
-                            height=143, 
-                            loop=False,
-                            speed=1
-                            )
+                            animation_house, width=200, height=143, loop=False, speed=1
+                        )
                     else:
                         sobre_precio = "Se encuentra por encima del precio de mercado"
                         st.write(
                             f'<div style="font-size: 18px; margin-top: -10px; text-align: center;">{sobre_precio}</div>',
-                            unsafe_allow_html=True
+                            unsafe_allow_html=True,
                         )
-                        with open("./streamlit_dev/visuales/red_animation.json") as source_house:
+                        with open(
+                            "./streamlit_dev/visuales/red_animation.json"
+                        ) as source_house:
                             animation_house = json.load(source_house)
                         # se ejecuta la animación
                         st_lottie(
-                            animation_house, 
-                            width=200, 
-                            height=143, 
-                            loop=False,
-                            speed=1
-                            )
+                            animation_house, width=200, height=143, loop=False, speed=1
+                        )
                 except:
                     st.error("Ups, un error ha ocurrido, intenta de nuevo")
 
