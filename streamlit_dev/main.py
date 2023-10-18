@@ -158,7 +158,7 @@ if selected == "Predecir":
         # recibir los inputs del ususario
         with st.form(key="Form1", clear_on_submit=True):
             bedrooms = st.number_input("Número de Recámaras", value=1)
-            bathrooms = st.number_input("Número de Baños", value=1.0)
+            bathrooms = st.number_input("Número de Baños", value=1.0, step=0.5)
             built_area = st.number_input("Tamaño de Construcción (M2)", value=1.0)
             land_area = st.number_input("Tamaño de Terreno (M2)", value=1.0)
             location = st.selectbox(
@@ -277,9 +277,11 @@ if selected == "Comparar":
         # Se crea un campo formulario que contendrá los campos para
         # recibir los inputs del ususario
         with st.form(key="Form3", clear_on_submit=True):
-            price = st.number_input("Precio de la casa", value=1.0)
+            price = st.number_input("Precio de la casa", value=1.0,
+                                    help="""Ingrese el precio de la casa que 
+                                    quiere comparar con el precio de mercado""")
             bedrooms = st.number_input("Número de Recámaras", value=1)
-            bathrooms = st.number_input("Número de Baños", value=1.0)
+            bathrooms = st.number_input("Número de Baños", value=1.0, step=0.5)
             built_area = st.number_input("Tamaño de Construcción (M2)", value=1.0)
             land_area = st.number_input("Tamaño de Terreno (M2)", value=1.0)
             location = st.selectbox(
