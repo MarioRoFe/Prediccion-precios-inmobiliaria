@@ -1,6 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_lottie import st_lottie
+import streamlit.components.v1 as components
+import plotly.express as px
 import json
 import pandas as pd
 import joblib
@@ -60,8 +62,8 @@ st.markdown("---")
 # ----------------------------- BARRA DE PAGINACIÓN -----------------------------
 selected = option_menu(
     menu_title=None,
-    options=["Home", "Predecir", "Comparar"],
-    icons=["house", "coin", "arrow-left-right"],
+    options=["Home", "Predecir", "Comparar", "Mapa"],
+    icons=["house", "coin", "arrow-left-right", "map"],
     default_index=0,
     menu_icon="list",
     orientation="horizontal",
@@ -69,7 +71,7 @@ selected = option_menu(
         "container": {"padding": "0!important", "background-color": "#262730"},
         "icon": {"color": "orange", "font-size": "25px"},
         "nav-link": {
-            "font-size": "25px",
+            "font-size": "20px",
             "text-aling": "left",
             "margin": "0px",
             "--hover-color": "#053C5E",
@@ -277,9 +279,12 @@ if selected == "Comparar":
         # Se crea un campo formulario que contendrá los campos para
         # recibir los inputs del ususario
         with st.form(key="Form3", clear_on_submit=True):
-            price = st.number_input("Precio de la casa", value=1.0,
-                                    help="""Ingrese el precio de la casa que 
-                                    quiere comparar con el precio de mercado""")
+            price = st.number_input(
+                "Precio de la casa",
+                value=1.0,
+                help="""Ingrese el precio de la casa que 
+                                    quiere comparar con el precio de mercado""",
+            )
             bedrooms = st.number_input("Número de Recámaras", value=1)
             bathrooms = st.number_input("Número de Baños", value=1.0, step=0.5)
             built_area = st.number_input("Tamaño de Construcción (M2)", value=1.0)
@@ -423,3 +428,72 @@ if selected == "Comparar":
             back = st.form_submit_button("Back")
 
     st.markdown("---")
+
+if selected == "Mapa":
+    with open("./streamlit_dev/D3Blocks.html", "r") as f:
+        grafica = f.read()
+
+    # bootstrap 4 collapse example
+    components.html(html=grafica, width=800, height=200)
+
+    df = pd.DataFrame(
+        data=pd.read_csv("./streamlit_dev/coordenadas_ciudad_oaxaca.csv"),
+        columns=["latitud", "longitud", "zip_code", "price", "location"],
+    )
+
+    df = df.groupby("zip_code", as_index=False).agg(
+        {
+            "latitud": "first",
+            "longitud": "first",
+            "price": "median",
+            "location": "first",
+        }
+    )
+
+    df["price"] = df["price"] / 1000000
+    df["location"] = df.location.str.replace("ne", "NorEste")
+    df["location"] = df.location.str.replace("nw", "NorOeste")
+    df["location"] = df.location.str.replace("se", "SurEste")
+    df["location"] = df.location.str.replace("sw", "SurOeste")
+
+    fig = px.scatter_mapbox(
+        df,
+        lat="latitud",
+        lon="longitud",
+        mapbox_style="carto-darkmatter",
+        zoom=11.4,
+        size="price",
+        color="location",
+        hover_name="location",
+        color_discrete_sequence=["#ffb703", "#ff006e", "#06d6a0", "#4cc9f0"],
+        width=830,
+        height=500,
+        hover_data={
+            "price": True,
+            "location": False,
+            "latitud": False,
+            "longitud": False,
+            "zip_code": True,
+        },
+        labels={
+            "price": "Precio (millones de pesos)",
+            "location": "Ubicación",
+            "zip_code": "Código Postal",
+        },
+    )
+
+    fig.update_layout(margin={"r": 0.5, "l": 0.5, "t": 0, "b": 0})
+    st.write(fig)
+    st.text(
+        """
+        En este mapa se pueden observar los precios promedio de las casas de acuerdo con la zona 
+        de la ciudad en la que se encuentran. Se tomaron 250 datos de distintas casas y se 
+        calculó su precio promedio agrupándolas según su código postal.
+         
+        Los colores de las burbujas representan cada una de las cuatro zonas en las que se 
+        dividió la ciudad, tomando de referencia el zócalo. 
+        
+        El tamaño de las burbujas está en función de su precio: burbujas más grandes indican 
+        precios más altos y viceversa
+        """
+    )
